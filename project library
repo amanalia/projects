@@ -1,0 +1,67 @@
+interface LibraryItem {
+  id: number;
+  title: string;
+  author: string;
+  publicationYear: number;
+  copiesAvailable: number;
+  borrowCopy(): void;
+  returnCopy(): void;
+  displayInfo(): string;
+}
+
+class Book implements LibraryItem {
+  constructor(
+    public id: number,
+    public title: string,
+    public author: string,
+    public publicationYear: number,
+    public copiesAvailable: number
+  ) {}
+
+  borrowCopy(): void {
+    if (this.copiesAvailable > 0) {
+      this.copiesAvailable--;
+    }
+  }
+
+  returnCopy(): void {
+    this.copiesAvailable++;
+  }
+
+  displayInfo(): string {
+    return `Book ID: ${this.id}, Title: ${this.title}, Author: ${this.author}, Publication Year: ${this.publicationYear}, Copies Available: ${this.copiesAvailable}`;
+  }
+}
+
+class LibraryMember {
+  constructor(public id: number, public name: string, public borrowedItems: LibraryItem[] = []) {}
+
+  borrowItem(item: LibraryItem): void {
+    if (item.copiesAvailable > 0) {
+      item.borrowCopy();
+      this.borrowedItems.push(item);
+    } else {
+      console.log('No copies of this item are available for borrowing.');
+    }
+  }
+
+  returnItem(item: LibraryItem): void {
+    const itemIndex = this.borrowedItems.findIndex((borrowedItem) => borrowedItem.id === item.id);
+    if (itemIndex !== -1) {
+      item.returnCopy();
+      this.borrowedItems.splice(itemIndex, 1);
+    } else {
+      console.log('This item is not borrowed by the member.');
+    }
+  }
+}
+
+// Usage example
+const member1 = new LibraryMember(1, 'John Doe');
+const book1: LibraryItem = new Book(101, '1984', 'George Orwell', 1949, 10);
+
+member1.borrowItem(book1);
+console.log(book1.displayInfo());
+
+member1.returnItem(book1);
+console.log(book1.displayInfo());
